@@ -1,0 +1,644 @@
+<body>
+    {{> sAlert}}
+</body>
+
+<template name="ApplicationLayout">
+  {{> yield "navbar"}}
+  {{> yield "sidebar"}}
+  {{> yield "main"}}
+</template>  
+
+<template name="navbar">
+  <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid" id="navbar_container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapse" aria-expanded="false">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="/" class="navbar-brand"><img src="http://vignette2.wikia.nocookie.net/clubpenguin/images/e/e1/Football_Pin.PNG/revision/latest?cb=20150315161319" alt="logo" class="logo"/></a>    
+          <a href="/" class="navbar-brand">Team Track</a>
+        </div>
+        <div class="collapse navbar-collapse" id="collapse">     
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a>{{> loginButtons}}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>  
+</template>
+
+<template name="sidebar">
+  <div id="wrapper">
+      <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+          <li>
+            <a target="_blank" href="http://www.fftoday.com/rankings/">Rankings</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://www.rotoworld.com/sports/nfl/football?ls=roto:nfl:gnav">Advice</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://www.nfl.com/scores">Scores</a>
+          </li>
+          <li>
+            <a target="_blank" href="http://www.nfl.com/standings">Standings</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+</template>
+
+<template name="football">
+  <div id="page-content-wrapper">
+    <div class="container-fluid" id="page_background" role="main">   
+    	<div class="row">
+        <div class="col-md-6 col-sm-12 col-xs-12">
+          <h1 id="player_header">Available Players<a href="#roster" class="btn btn-default" id="team_button">Roster</a></h1>
+          <div class="input-group">
+            <span class="input-group-addon">
+              <i class="glyphicon glyphicon-search"></i>
+            </span>
+            <input type="text" id="js-name_search" name="searchName" class="form-control" placeholder="Find a player by name">
+            <input type="text" id="js-position_search" name="searchPosition" class="form-control" placeholder="Find a player by position">
+            <input type="text" id="js-team_search" name="searchTeam" class="form-control" placeholder="Find a player by team">
+          </div> 
+          <ul class="list-group" id="player_list">
+          {{#each players}}                           
+            <li class="list-group-item">
+              <img class="logo" src="{{logo}}" alt="{{alt}}"/>
+              <a href="#" id="{{_id}}"><b>{{name}}</b></a>
+              <p> - {{position}}</p>
+              <p> - {{team}}</p>
+            </li>             
+          {{/each}}
+          </ul>
+        </div>
+        <div class="col-md-6 col-sm-12 col-xs-12" id="roster">
+          <h1 class="team_header">Roster
+            {{#if isTeam}}
+                {{#each showTeam}}
+                  : {{name}}
+                {{/each}}
+            {{/if}}
+          </h1>
+          <ul class="list-group" id="roster_list">
+            <li class="list-group-item" id="qb-1">
+              <p>QB</p>
+            </li>
+            <li class="list-group-item" id="rb-1">
+              <p>RB1</p>
+            </li>
+            <li class="list-group-item" id="rb-2">
+              <p>RB2</p>
+            </li>
+            <li class="list-group-item" id="wr-1">
+              <p>WR1</p>
+            </li>
+            <li class="list-group-item" id="wr-2">
+              <p>WR2</p>
+            </li>
+            <li class="list-group-item" id="wr-3">
+              <p>W/R/T</p>
+            </li>
+            <li class="list-group-item" id="te-1">
+              <p>TE</p>
+            </li>
+          </ul>
+          {{#if currentUser}}
+            <form class="save_team" id="js-save">
+              <input type="text" name="saveTeam" placeholder="Enter a team name." required/>
+              <input type="submit" class="btn btn-success" value="Save Team" />
+            </form>
+            <br> 
+            <form class="load_team">               
+              <select id="loadTeam">
+              {{#each teams}}
+                <option id="{{_id}}" value="{{_id}}">{{name}}</option>
+              {{/each}}
+              </select> 
+              <input type="submit" class="btn btn-primary" value="Load Team"/>
+            </form>
+            {{#if isTeam}}
+              <br>
+              <a href="/team" class="btn btn-success" id="js-loaded_team">Go To Team Page</a>
+              <button class="btn btn-primary" id="js-update">Update Team</button>
+              <br>
+            {{/if}}           
+          {{/if}}
+          <br>
+          <button class="btn btn-danger" id="js-reset">Reset Roster</button>         
+          <a href="#player_header" class="btn btn-default" id="player_back">Back to Players</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="team">
+   <div id="page-content-wrapper">
+    <div class="container-fluid" id="page_background" role="main">      
+      <div class="row">
+         <div class="col-md-12 col-sm-12 col-xs-12" id="roster">
+          {{#each showTeam}}
+            <h1 class="team_header">{{name}}</h1>
+            <ul class="list-group" id="team_list">  
+              <a href="/team/{{QB.name}}" id="{{QB._id}}">            
+              <li class="list-group-item" id="qb-1">
+                <img class="logo" src="{{QB.logo}}" alt="{{QB.alt}}"/>
+                <p><b>{{QB.name}}</b></p>
+                <p> - {{QB.position}}</p>
+                <p> - {{QB.team}}</p>
+                <br>
+                {{#each findQB}}
+                  <p><b>Projected 2017 Stats:</b> Passing Yards: {{toFixed [PASS YDS]}}, Passing TDs: {{toFixed [PASS TDS]}}, Ints: {{toFixed INTS}}, Rushing Yards: {{toFixed [RUSH YDS]}}, Rushing TDs: {{toFixed [RUSH TDS]}}, Fumbles: {{toFixed FL}}</p>
+                {{/each}}
+                <br>
+                {{#each findQB_2017}}
+                  <p><b>Actual 2017 Stats:</b> Passing Yards: {{[PASS YDS]}}, Passing TDs: {{[PASS TDS]}}, Ints: {{INTS}}, Rushing Yards: {{[RUSH YDS]}}, Rushing TDs: {{[RUSH TDS]}}, Fumbles: {{FL}}</p>
+                {{/each}}
+              </li>
+              </a>
+              <a href="/team/{{RB1.name}}" id="{{RB1._id}}">
+              <li class="list-group-item" id="rb-1">
+                <img class="logo" src="{{RB1.logo}}" alt="{{RB1.alt}}"/>
+                <p><b>{{RB1.name}}</b></p>
+                <p> - {{RB1.position}}</p>
+                <p> - {{RB1.team}}</p>
+                <br>
+                {{#each findRB1}}
+                  <p><b>Projected 2017 Stats:</b> Rushing Yards: {{toFixed YDS}}, Rushing TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}, Receiving Yards: {{toFixed [REC YDS]}}, Receiving TDs: {{toFixed [REC TDS]}}</p>
+                {{/each}}
+                <br>
+                {{#each findRB1_2017}}
+                  <p><b>Actual 2017 Stats:</b> Rushing Yards: {{YDS}}, Rushing TDs: {{TDS}}, Fumbles: {{FL}}, Receiving Yards: {{[REC YDS]}}, Receiving TDs: {{[REC TDS]}}</p>
+                {{/each}}
+              </li>
+              </a>
+              <a href="/team/{{RB2.name}}" id="{{RB2._id}}">
+              <li class="list-group-item" id="rb-2">
+                <img class="logo" src="{{RB2.logo}}" alt="{{RB2.alt}}"/>
+                <p><b>{{RB2.name}}</b></p>
+                <p> - {{RB2.position}}</p>
+                <p> - {{RB2.team}}</p>
+                <br>
+                {{#each findRB2}}
+                  <p><b>Projected 2017 Stats:</b> Rushing Yards: {{toFixed YDS}}, Rushing TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}, Receiving Yards: {{toFixed [REC YDS]}}, Receiving TDs: {{toFixed [REC TDS]}}</p>
+                {{/each}}
+                <br>
+                {{#each findRB2_2017}}
+                  <p><b>Actual 2017 Stats:</b> Rushing Yards: {{YDS}}, Rushing TDs: {{TDS}}, Fumbles: {{FL}}, Receiving Yards: {{[REC YDS]}}, Receiving TDs: {{[REC TDS]}}</p>
+                {{/each}}
+              </li>
+              </a>
+              <a href="/team/{{WR1.name}}" id="{{WR1._id}}">
+              <li class="list-group-item" id="wr-1">
+                <img class="logo" src="{{WR1.logo}}" alt="{{WR1.alt}}"/>
+                <p><b>{{WR1.name}}</b></p>
+                <p> - {{WR1.position}}</p>
+                <p> - {{WR1.team}}</p>
+                <br>
+                {{#each findWR1}}
+                  <p><b>Projected 2017 Stats:</b> Receiving Yards: {{toFixed YDS}}, Receiving TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}</p>
+                {{/each}}
+                <br>
+                {{#each findWR1_2017}}
+                  <p><b>Actual 2017 Stats:</b> Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                {{/each}}
+              </li>
+              </a>
+              <a href="/team/{{WR2.name}}" id="{{WR2._id}}">
+              <li class="list-group-item" id="wr-2">
+                <img class="logo" src="{{WR2.logo}}" alt="{{WR2.alt}}"/>
+                <p><b>{{WR2.name}}</b></p>
+                <p> - {{WR2.position}}</p>
+                <p> - {{WR2.team}}</p>
+                <br>
+                {{#each findWR2}}
+                  <p><b>Projected 2017 Stats:</b> Receiving Yards: {{toFixed YDS}}, Receiving TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}</p>
+                {{/each}}
+                <br>
+                {{#each findWR2_2017}}
+                  <p><b>Actual 2017 Stats:</b> Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                {{/each}}
+              </li>
+              </a>
+              <a href="/team/{{WR3.name}}" id="{{WR3._id}}">
+              <li class="list-group-item" id="wr-3">
+                <img class="logo" src="{{WR3.logo}}" alt="{{WR3.alt}}"/>
+                <p><b>{{WR3.name}}</b></p>
+                <p> - {{WR3.position}}</p>
+                <p> - {{WR3.team}}</p>
+                <br>
+                {{#each findWR3}}
+                  <p><b>Projected 2017 Stats:</b> Receiving Yards: {{toFixed YDS}}, Receiving TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}</p>
+                {{/each}}
+                <br>
+                {{#each findWR3_2017}}
+                  <p><b>Actual 2017 Stats:</b> Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                {{/each}}
+              </li>
+              </a>
+              <a href="/team/{{TE.name}}" id="{{TE._id}}">
+              <li class="list-group-item" id="te-1">
+                <img class="logo" src="{{TE.logo}}" alt="{{TE.alt}}"/>
+                <p><b>{{TE.name}}</b></p>
+                <p> - {{TE.position}}</p>
+                <p> - {{TE.team}}</p>
+                <br>
+                {{#each findTE}}
+                  <p><b>Projected 2017 Stats:</b> Receiving Yards: {{toFixed YDS}}, Receiving TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}</p>
+                {{/each}}
+                <br>
+                {{#each findTE_2017}}
+                  <p><b>Actual 2017 Stats:</b> Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                {{/each}}
+              </li>
+              </a>              
+            </ul>
+            <br>                        
+          {{/each}}
+         </div>
+         <button class="btn btn-danger" id="js-delete">Delete Team</button>
+         <a href="/" class="btn btn-success" id="js-player_back">Back to Players</a> 
+      </div>
+    </div>
+  </div>      
+</template>
+
+<template name="player">
+  <div id="page-content-wrapper">
+    <div class="container-fluid" id="page_background" role="main">      
+      <div class="row">
+         <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="card-outline-primary player">
+              <img class="card-img-top big_logo" id="big_logo" src="{{logo}}" alt="{{alt}}"/>
+              <div class="card-block">
+                <h2 class="card-title">{{name}}</h2>                  
+                <h3 class="card-text">{{position}} - {{team}}</h3>
+                <br>
+                {{#if isQB}}
+                  {{#each showStats}}
+                    <h4 class="card-text"><b>Projected 2017 Passing Stats:</b> Passing Yards: {{toFixed [PASS YDS]}}, Passing TDs: {{toFixed [PASS TDS]}}, Ints: {{toFixed INTS}}</h4>
+                    <h4 class="card-text"><b>Projected 2017 Rushing Stats:</b> Rushing Yards: {{toFixed [RUSH YDS]}}, Rushing TDs: {{toFixed [RUSH TDS]}}, Fumbles: {{toFixed FL}}</h4>
+                  {{/each}}
+                  <br>                 
+                  {{#each show2017Stats}}                  
+                    <h4 class="card-text"><b>2017 Passing Stats:</b> Passing Yards: {{[PASS YDS]}}, Passing TDs: {{[PASS TDS]}}, Ints: {{INTS}}</h4>
+                    <h4 class="card-text"><b>2017 Rushing Stats:</b> Rushing Yards: {{[RUSH YDS]}}, Rushing TDs: {{[RUSH TDS]}}, Fumbles: {{FL}}</h4>
+                  {{/each}}                  
+                  {{#if isBad}}
+                    <br>
+                    <div>  
+                     <h4 class="card-text"><img src="http://cdn.onlinewebfonts.com/svg/img_427426.png" alt="thumbs down" class="bad_player"/><b>Bad Year!</b></h4>
+                    </div>
+                  {{/if}}
+                  {{#if compStats}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Gold_Star.svg/1000px-Gold_Star.svg.png" alt="gold star" class="good_player"/><b>Better than projected!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopFiveQB}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://d30y9cdsu7xlg0.cloudfront.net/png/114472-200.png" alt="thumbs up" class="top_five_player"/><b>Top five player at this position!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopTwelveQB}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="http://www.clker.com/cliparts/M/f/r/c/0/Z/football-helmet-md.png" alt="football helmet" class="top_twelve_player"/><b>Starter in a twelve team league.</b></h4>
+                     </div>
+                  {{/if}}
+                {{/if}}
+                {{#if isRB}}
+                  {{#each showStats}}
+                    <h4 class="card-text"><b>Projected 2017 Rushing Stats:</b> Rushing Yards: {{toFixed YDS}}, Rushing TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}</h4>
+                    <h4 class="card-text"><b>Projected 2017 Receiving Stats:</b> Receiving Yards: {{toFixed [REC YDS]}}, Receiving TDs: {{toFixed [REC TDS]}}</h4>
+                  {{/each}}
+                  <br>                 
+                  {{#each show2017Stats}}
+                    <h4 class="card-text"><b>2017 Rushing Stats:</b> Rushing Yards: {{YDS}}, Rushing TDs: {{TDS}}, Fumbles: {{FL}}</h4>
+                    <h4 class="card-text"><b>2017 Receiving Stats:</b> Receiving Yards: {{[REC YDS]}}, Receiving TDs: {{[REC TDS]}}</h4>
+                  {{/each}}                 
+                  {{#if isBad}}
+                    <br>
+                    <div>  
+                     <h4 class="card-text"><img src="http://cdn.onlinewebfonts.com/svg/img_427426.png" alt="thumbs down" class="bad_player"/><b>Bad Year!</b></h4>
+                    </div>
+                  {{/if}}
+                  {{#if compStats}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Gold_Star.svg/1000px-Gold_Star.svg.png" alt="gold star" class="good_player"/><b>Better than projected!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopFiveRB}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://d30y9cdsu7xlg0.cloudfront.net/png/114472-200.png" alt="thumbs up" class="top_five_player"/><b>Top five player at this position!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopTwelveRB}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="http://www.clker.com/cliparts/M/f/r/c/0/Z/football-helmet-md.png" alt="football helmet" class="top_twelve_player"/><b>Starter in a twelve team league.</b></h4>
+                     </div>
+                  {{/if}}
+                {{/if}}
+                {{#if isWR}}
+                  {{#each showStats}}
+                    <h4 class="card-text"><b>Projected 2017 Receiving Stats:</b> Receiving Yards: {{toFixed YDS}}, Receiving TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}</h4>
+                  {{/each}}
+                    <br>                 
+                  {{#each show2017Stats}}
+                    <h4 class="card-text"><b>2017 Receiving Stats:</b> Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</h4>
+                  {{/each}}                  
+                  {{#if isBad}}
+                    <br>
+                    <div>  
+                     <h4 class="card-text"><img src="http://cdn.onlinewebfonts.com/svg/img_427426.png" alt="thumbs down" class="bad_player"/><b>Bad Year!</b></h4>
+                    </div>
+                  {{/if}}
+                  {{#if compStats}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Gold_Star.svg/1000px-Gold_Star.svg.png" alt="gold star" class="good_player"/><b>Better than projected!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopFiveWR}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://d30y9cdsu7xlg0.cloudfront.net/png/114472-200.png" alt="thumbs up" class="top_five_player"/><b>Top five player at this position!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopTwelveWR}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="http://www.clker.com/cliparts/M/f/r/c/0/Z/football-helmet-md.png" alt="football helmet" class="top_twelve_player"/><b>Starter in a twelve team league.</b></h4>
+                     </div>
+                  {{/if}}
+                {{/if}}
+                {{#if isTE}}
+                  {{#each showStats}}
+                    <h4 class="card-text"><b>Projected 2017 Receiving Stats:</b> Receiving Yards: {{toFixed YDS}}, Receiving TDs: {{toFixed TDS}}, Fumbles: {{toFixed FL}}</h4>
+                  {{/each}}
+                  <br>                 
+                  {{#each show2017Stats}}
+                    <h4 class="card-text"><b>2017 Receiving Stats:</b> Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</h4>
+                  {{/each}}                 
+                 {{#if isBad}}
+                    <br>
+                    <div>  
+                     <h4 class="card-text"><img src="http://cdn.onlinewebfonts.com/svg/img_427426.png" alt="thumbs down" class="bad_player"/><b>Bad Year!</b></h4>
+                    </div>
+                  {{/if}}
+                  {{#if compStats}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Gold_Star.svg/1000px-Gold_Star.svg.png" alt="gold star" class="good_player"/><b>Better than projected!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopFiveTE}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="https://d30y9cdsu7xlg0.cloudfront.net/png/114472-200.png" alt="thumbs up" class="top_five_player"/><b>Top five player at this position!</b></h4>
+                     </div>
+                  {{/if}}
+                  {{#if isTopTwelveTE}}
+                    <br>
+                     <div> 
+                      <h4 class="card-text"><img src="http://www.clker.com/cliparts/M/f/r/c/0/Z/football-helmet-md.png" alt="football helmet" class="top_twelve_player"/><b>Starter in a twelve team league.</b></h4>
+                     </div>
+                  {{/if}}
+                {{/if}}
+                <br> 
+                <a href="/team" class="btn btn-success" id="js-team_back">Back to Team</a>
+              </div> 
+            </div>       
+        </div>
+      </div> 
+      <div class="row"> 
+        {{#if isQB}}
+          {{#if isBetterQB}} 
+            <h2 class="better_headline">Players with better stats at quarterback:</h2>
+          {{/if}}
+        {{/if}}
+        <div class="card-group">
+         {{#if isQB}}
+          {{#each pickBetterQB}}
+          <a href="/team/{{name}}">
+            <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+              <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+              <div class="card-block">                 
+                <h4 class="card-title">{{name}}</h4>                  
+                <p class="card-text"><b>{{position}} - {{team}}</b></p>                
+                {{#each show2017Stats}}                  
+                  <p class="card-text"><b>2017 Passing Stats:</b></p> 
+                  <p class="card-text">Passing Yards: {{[PASS YDS]}}, Passing TDs: {{[PASS TDS]}}, Ints: {{INTS}}</p>
+                  <p class="card-text"><b>2017 Rushing Stats:</b></p>
+                  <p class="card-text">Rushing Yards: {{[RUSH YDS]}}, Rushing TDs: {{[RUSH TDS]}}, Fumbles: {{FL}}</p>
+                {{/each}}                
+              </div>              
+            </div>
+          </a>
+          {{/each}}
+        {{/if}}
+        </div>
+      </div>
+      <div class="row">
+        {{#if isQB}}        
+          {{#if isWorseQB}} 
+            <h2 class="better_headline">Players with worse stats at quarterback:</h2>
+          {{/if}}  
+        {{/if}}           
+        <div class="card-group">
+        {{#if isQB}}            
+          {{#each pickWorseQB}}
+          <a href="/team/{{name}}">
+            <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+              <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+              <div class="card-block">                 
+                <h4 class="card-title">{{name}}</h4>                  
+                <p class="card-text"><b>{{position}} - {{team}}</b></p>                
+                {{#each show2017Stats}}                  
+                  <p class="card-text"><b>2017 Passing Stats:</b></p> 
+                  <p class="card-text">Passing Yards: {{[PASS YDS]}}, Passing TDs: {{[PASS TDS]}}, Ints: {{INTS}}</p>
+                  <p class="card-text"><b>2017 Rushing Stats:</b></p>
+                  <p class="card-text">Rushing Yards: {{[RUSH YDS]}}, Rushing TDs: {{[RUSH TDS]}}, Fumbles: {{FL}}</p>
+                {{/each}}                
+              </div>              
+            </div>
+          </a>
+          {{/each}}
+        {{/if}}
+        </div>
+      </div>  
+      <div class="row">      
+        {{#if isRB}}
+          {{#if isBetterRB}} 
+            <h2 class="better_headline">Players with better stats at running back:</h2>
+          {{/if}}
+        {{/if}}
+        <div class="card-group">
+          {{#if isRB}}
+            {{#each pickBetterRB}}
+            <a href="/team/{{name}}">
+            <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+                <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+                <div class="card-block">                 
+                  <h4 class="card-title">{{name}}</h4>                  
+                  <p class="card-text"><b>{{position}} - {{team}}</b></p>               
+                  {{#each show2017Stats}}                  
+                    <p class="card-text"><b>2017 Rushing Stats:</b></p>
+                    <p class="card-text">Rushing Yards: {{YDS}}, Rushing TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                    <p class="card-text"><b>2017 Receiving Stats:</b></p>
+                    <p class="card-text">Receiving Yards: {{[REC YDS]}}, Receiving TDs: {{[REC TDS]}}</p>
+                  {{/each}}                
+                </div>              
+              </div>
+            </a>
+            {{/each}}
+          {{/if}}
+        </div>
+       </div>
+      <div class="row">      
+        {{#if isRB}}
+          {{#if isWorseRB}} 
+            <h2 class="better_headline">Players with worse stats at running back:</h2>
+          {{/if}}
+        {{/if}}
+        <div class="card-group">
+          {{#if isRB}}
+            {{#each pickWorseRB}}
+            <a href="/team/{{name}}">
+              <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+                <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+                <div class="card-block">                 
+                  <h4 class="card-title">{{name}}</h4>                  
+                  <p class="card-text"><b>{{position}} - {{team}}</b></p>               
+                  {{#each show2017Stats}}                  
+                    <p class="card-text"><b>2017 Rushing Stats:</b></p>
+                    <p class="card-text">Rushing Yards: {{YDS}}, Rushing TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                    <p class="card-text"><b>2017 Receiving Stats:</b></p>
+                    <p class="card-text">Receiving Yards: {{[REC YDS]}}, Receiving TDs: {{[REC TDS]}}</p>
+                  {{/each}}                
+                </div>              
+              </div>
+            </a>
+            {{/each}}
+          {{/if}}
+        </div>
+      </div>
+      <div class="row"> 
+      {{#if isWR}}
+        {{#if isBetterWR}}
+          <h2 class="better_headline">Players with better stats at wide receiver:</h2>
+        {{/if}}
+      {{/if}} 
+        <div class="card-group">
+          {{#if isWR}}
+            {{#each pickBetterWR}}
+            <a href="/team/{{name}}">
+              <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+                <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+                <div class="card-block">                 
+                  <h4 class="card-title">{{name}}</h4>                  
+                  <p class="card-text"><b>{{position}} - {{team}}</b></p>                
+                  {{#each show2017Stats}}
+                    <p class="card-text"><b>2017 Receiving Stats:</b></p>
+                    <p class="card-text">Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                  {{/each}}                
+                </div>              
+              </div>
+            </a>
+            {{/each}}
+          {{/if}}
+        </div>
+      </div>
+      <div class="row"> 
+      {{#if isWR}}
+        {{#if isWorseWR}}
+          <h2 class="better_headline">Players with worse stats at wide receiver:</h2>
+        {{/if}}
+      {{/if}} 
+        <div class="card-group">
+          {{#if isWR}}
+            {{#each pickWorseWR}}
+            <a href="/team/{{name}}">
+              <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+                <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+                <div class="card-block">                 
+                  <h4 class="card-title">{{name}}</h4>                  
+                  <p class="card-text"><b>{{position}} - {{team}}</b></p>                
+                  {{#each show2017Stats}}
+                    <p class="card-text"><b>2017 Receiving Stats:</b></p>
+                    <p class="card-text">Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                  {{/each}}                
+                </div>              
+              </div>
+            </a>
+            {{/each}}
+          {{/if}}
+        </div>
+      </div>
+      <div class="row">        
+      {{#if isTE}}
+        {{#if isBetterTE}} 
+          <h2 class="better_headline">Players with better stats at tight end:</h2>
+        {{/if}}
+      {{/if}}    
+        <div class="card-group">
+          {{#if isTE}}
+          {{#each pickBetterTE}}
+          <a href="/team/{{name}}">
+            <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+              <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+              <div class="card-block">                 
+                <h4 class="card-title">{{name}}</h4>                  
+                <p class="card-text"><b>{{position}} - {{team}}</b></p>                
+                {{#each show2017Stats}}
+                  <p class="card-text"><b>2017 Receiving Stats:</b></p>
+                  <p class="card-text">Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                {{/each}}               
+              </div>              
+            </div>
+          </a>
+          {{/each}}
+          {{/if}}
+        </div> 
+      </div>
+      <div class="row">        
+      {{#if isTE}}
+        {{#if isWorseTE}} 
+          <h2 class="better_headline">Players with worse stats at tight end:</h2>
+        {{/if}}
+      {{/if}}    
+        <div class="card-group">
+          {{#if isTE}}
+          {{#each pickWorseTE}}
+          <a href="/team/{{name}}">
+            <div class="card col-md-2 col-sm-12 col-xs-12 better_player">              
+              <img class="card-img-top logo" src="{{logo}}" alt="{{alt}}"/>
+              <div class="card-block">                 
+                <h4 class="card-title">{{name}}</h4>                  
+                <p class="card-text"><b>{{position}} - {{team}}</b></p>                
+                {{#each show2017Stats}}
+                  <p class="card-text"><b>2017 Receiving Stats:</b></p>
+                  <p class="card-text">Receiving Yards: {{YDS}}, Receiving TDs: {{TDS}}, Fumbles: {{FL}}</p>
+                {{/each}}               
+              </div>              
+            </div>
+          </a>
+          {{/each}}
+          {{/if}}
+        </div> 
+      </div>    
+    </div>
+  </div>
+</template>
+
